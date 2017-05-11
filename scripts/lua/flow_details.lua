@@ -182,6 +182,10 @@ else
    if((flow.client_process ~= nil) or (flow.server_process ~= nil))then	print("s") end
    print("flows_stats.lua?application=" .. flow["proto.ndpi"] .. "\">")
    print(getApplicationLabel(flow["proto.ndpi"]).." ("..flow["proto.ndpi_id"]..")")
+    -- affichage de la version ssl
+   if((string.find(flow["proto.ndpi"],"SSL") ~= nil) and flow["protos.ssl.version"] == nil) then print(" Version non disponible ") end
+   if(flow["protos.ssl.version"] ~= nil) then print(" v"..flow["protos.ssl.version"]) end
+   -- fin de modif
    print("</A> ".. formatBreed(flow["proto.ndpi_breed"]))
    if(flow["verdict.pass"] == false) then print("</strike>") end
    historicalProtoHostHref(ifid, flow["cli.ip"], nil, flow["proto.ndpi_id"], flow["protos.ssl.certificate"])
