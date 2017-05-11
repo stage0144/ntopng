@@ -116,6 +116,7 @@ class Flow : public GenericHashEntry {
       bool firstdata_seen;
       struct timeval clienthello_time, hs_end_time, lastdata_time;
       float hs_delta_time, delta_firstData, deltaTime_data;
+      u_int8_t version; /* rajout d'une variable de stockage de la version */    
     } ssl;
 
     struct {
