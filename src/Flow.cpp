@@ -531,11 +531,19 @@ void Flow::processDetectedProtocol() {
 			// test pour savoir de quel type de version, d'autres versions peuvent être rajoutés
 			if(packet->payload[9] == 0x03 && packet->payload[10] == 0x01) 
 			{
-				protos.ssl.version = 1.0;
+				protos.ssl.version = strdup("1.0");
 			}
-			else if(packet->payload[9] == 0x7f && packet->payload[10] == 0x13)
+			else if(packet->payload[9] == 0x03 && packet->payload[10] == 0x02)
 			{
-				protos.ssl.version = 1.3;
+				protos.ssl.version = strdup("1.1");
+			}
+			else if(packet->payload[9] == 0x03 && packet->payload[10] == 0x03)
+			{
+				protos.ssl.version = strdup("1.2");
+			}
+			else if(packet->payload[9] == 0x03 && packet->payload[10] == 0x04)
+			{
+				protos.ssl.version = strdup("1.3");
 			}
 		}
 	}
@@ -1600,7 +1608,7 @@ void Flow::lua(lua_State* vm, AddressTree * ptree,
 	/* --------------- version ssl ------------------ */
 	
 	if(protos.ssl.version)
-	  lua_push_float_table_entry(vm, "protos.ssl.version", protos.ssl.version);
+	  lua_push_str_table_entry(vm, "protos.ssl.version", protos.ssl.version);
 
 	/* --- */
 	
