@@ -519,10 +519,10 @@ void Flow::processDetectedProtocol() {
     }
     
     /* rajout de la version du ssl */
-      
+    		protos.ssl.version = NULL;
+  
 	if(protos.ssl.version == NULL)
 	{
-		protos.ssl.version = NULL;
 		struct ndpi_packet_struct *packet = &ndpiFlow->packet;
 		if(packet->payload[0] == 0x16){ // on récupère la version serveur du SSL si il y a un Handshake
 			// test pour savoir de quel type de version, d'autres versions peuvent être rajoutés
@@ -542,9 +542,6 @@ void Flow::processDetectedProtocol() {
 			{
 				protos.ssl.version = strdup("1.3");
 			}
-		}else 		//affichage de la version SSL client si le hanshake n'est pas encore valide
-		{
-			protos.ssl.version = strdup((char*)packet->payload[0]);
 		}
 	}
 	
