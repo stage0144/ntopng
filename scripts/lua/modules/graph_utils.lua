@@ -517,6 +517,111 @@ function drawRRD(ifid, host, rrdFile, zoomLevel, baseurl, show_timeseries,
    end
 
    if(ntop.notEmptyFile(rrdname)) then
+<<<<<<< HEAD
+=======
+      -- print("=> Found "..rrdname.."<p>\n")
+      -- print("=> "..rrdname)
+      -- io.write("=> *** ".. start_time .. "|" .. end_time .. "<p>\n")
+      local fstart, fstep, fnames, fdata = ntop.rrd_fetch(rrdname, 'AVERAGE', start_time, end_time)
+      --print("=> here we go")
+      local max_num_points = 600 -- This is to avoid having too many points and thus a fat graph
+      local num_points_found = table.getn(fdata)
+      local sample_rate = round(num_points_found / max_num_points)
+
+      if(sample_rate < 1) then
+	 sample_rate = 1
+      end
+
+      -- DEBUG
+      --tprint(fdata, 1)
+
+      step = fstep
+      num = 0
+      names_cache = {}
+      for i, n in ipairs(fnames) do
+         -- handle duplicates
+         if (names_cache[n] == nil) then
+           names_cache[n] = true
+           names[num] = prefixLabel
+           if(host ~= nil) then names[num] = names[num] .. " (" .. firstToUpper(n)..")" end
+           num = num + 1
+           --io.write(prefixLabel.."\n")
+           --print(num.."\n")
+         end
+      end
+
+      id = 0
+      sampling = 0
+      --sample_rate = 1
+      sample_rate = sample_rate-1
+      accumulated = 0
+      for i, v in ipairs(fdata) do
+	 s = {}
+	 s[0] = fstart + (i-1)*fstep
+	 num_points = num_points + 1
+
+	 local elemId = 1
+	 for _, w in ipairs(v) do
+	    if(w ~= w) then
+	       -- This is a NaN
+	       v = 0
+	    else
+	       --io.write(w.."\n")
+	       v = tonumber(w)
+	       if(v < 0) then
+		  v = 0
+	       end
+	    end
+
+	    if(v > 0) then
+	       lastval_bits_time = s[0]
+	       lastval_bits = v
+	    end
+
+	    s[elemId] = v*8 -- bps
+	    --if(s[elemId] > 0) then io.write("[".. elemId .. "]=" .. s[elemId] .."\n") end
+	    elemId = elemId + 1
+	 end
+
+	 total_bytes = total_bytes + v*fstep
+	 --if((v*fstep) > 0) then io.write(" | " .. (v*fstep) .." | [sampling: ".. sampling .. "/" .. sample_rate.."]\n") end
+
+	 if(sampling == sample_rate) then
+	    if(sample_rate > 0) then
+	       s[1] = accumulated / sample_rate
+	    end
+	    series[id] = s
+	    id = id + 1
+	    sampling = 0
+	    accumulated = 0
+	 else
+	    accumulated = accumulated + s[1]
+	    sampling = sampling + 1
+	 end
+      end
+
+      for key, value in pairs(series) do
+	 local t = 0
+
+	 for elemId=0,(num-1) do
+	    --io.write(key.."="..value[elemId+1].. "\n")
+	    t = t + value[elemId+1] -- bps
+	 end
+
+	 t = t * step
+
+	 if(((minval_bits_time == 0) or (minval_bits >= t)) and (value[0] < lastval_bits_time)) then
+	    --io.write(value[0].."\t".. t .. "\t".. lastval_bits_time .. "\n")
+	    minval_bits_time = value[0]
+	    minval_bits = t
+	 end
+
+	 if((maxval_bits_time == 0) or (maxval_bits <= t)) then
+	    maxval_bits_time = value[0]
+	    maxval_bits = t
+	 end
+      end
+>>>>>>> dc3872b88c463aa5e5ba333fd357c8641f72c283
 
       print [[
 

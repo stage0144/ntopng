@@ -37,6 +37,12 @@ if [ -f /etc/init.d/functions ]; then
 fi
 
 
+#
+# This to avoid issues in case there are local files 
+# (Example when ntopng has been cloned from git)
+#
+cd /
+
 error_handler() {
     EXIT_ON_END=$0
 

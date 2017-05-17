@@ -14,7 +14,11 @@ ntopng:
 	cd $(NTOPNG_HOME); make ; cp ntopng ${NTOPNG_BUILD}/usr/bin/
 	cp $(NTOPNG_HOME)/ntopng.8 ${NTOPNG_BUILD}/usr/share/man/man8
 	cp -r $(NTOPNG_HOME)/httpdocs ${NTOPNG_BUILD}/usr/share/ntopng
+<<<<<<< HEAD
 	cp -Lr $(NTOPNG_HOME)/scripts ${NTOPNG_BUILD}/usr/share/ntopng  # L to dereference symlinks
+=======
+	cp -r $(NTOPNG_HOME)/scripts ${NTOPNG_BUILD}/usr/share/ntopng
+>>>>>>> dc3872b88c463aa5e5ba333fd357c8641f72c283
 	mv ${NTOPNG_BUILD}/usr/share/ntopng/httpdocs/ssl/ntopng-cert.pem.dummy ${NTOPNG_BUILD}/usr/share/ntopng/httpdocs/ssl/ntopng-cert.pem
 	if test -d "$(NTOPNG_HOME)/pro"; then \
 		mkdir ${NTOPNG_BUILD}/usr/share/ntopng/pro; \
@@ -38,7 +42,11 @@ ntopng:
 	@/bin/rm -f ../ntopng_*deb
 	@SUDO@ dpkg-buildpackage -rfakeroot -d -us -uc -b
 	@CHOWN@
+<<<<<<< HEAD
 	dpkg-sig --sign builder -k D1EB60BE ../ntopng_*deb
+=======
+	dpkg-sig --sign builder -k 7921DF34 ../ntopng_*deb
+>>>>>>> dc3872b88c463aa5e5ba333fd357c8641f72c283
 	@\rm -f ../ntopng_*dsc ../ntopng_*.gz ../ntopng_*changes
 	@/bin/mv ../ntopng_*deb .
 	@echo
@@ -65,7 +73,11 @@ ntopng-data:
 	@/bin/rm -f ../ntopng-data_*deb
 	@SUDO@ dpkg-buildpackage -rfakeroot -d -us -uc
 	@SUDO@ chown ${USER}:${GROUP} ../ntopng-data_*deb
+<<<<<<< HEAD
 	dpkg-sig --sign builder -k D1EB60BE ../ntopng-data_*deb
+=======
+	dpkg-sig --sign builder -k 7921DF34 ../ntopng-data_*deb
+>>>>>>> dc3872b88c463aa5e5ba333fd357c8641f72c283
 	@\rm -f ../ntopng-data_*dsc ../ntopng-data_*.gz ../ntopng-data_*changes
 	@/bin/mv ../ntopng-data_*deb .
 	@echo
@@ -83,4 +95,8 @@ install:
 	echo "dummy install"
 
 clean:
+<<<<<<< HEAD
 	-@SUDO@ rm -rf *~ *deb debian.ntopng/ntopng-data debian.ntopng-data/ntopng ./usr
+=======
+	-@SUDO@ rm -rf *~ *deb debian/tmp ./usr
+>>>>>>> dc3872b88c463aa5e5ba333fd357c8641f72c283

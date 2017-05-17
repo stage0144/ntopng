@@ -31,7 +31,11 @@ Prefs::Prefs(Ntop *_ntop) {
   local_networks_set = false, shutdown_when_done = false;
   enable_users_login = true, disable_localhost_login = false;
   enable_dns_resolution = sniff_dns_responses = true, use_promiscuous_mode = true;
+<<<<<<< HEAD
   resolve_all_host_ip = false, online_license_check = false;
+=======
+  categorization_enabled = false, httpbl_enabled = false, resolve_all_host_ip = false;
+>>>>>>> dc3872b88c463aa5e5ba333fd357c8641f72c283
   max_num_hosts = MAX_NUM_INTERFACE_HOSTS, max_num_flows = MAX_NUM_INTERFACE_HOSTS;
   attacker_max_num_flows_per_sec = victim_max_num_flows_per_sec = CONST_MAX_NEW_FLOWS_SECOND;
   attacker_max_num_syn_per_sec = victim_max_num_syn_per_sec = CONST_MAX_NUM_SYN_PER_SECOND;  
@@ -44,12 +48,17 @@ Prefs::Prefs(Ntop *_ntop) {
   scripts_dir = strdup(CONST_DEFAULT_SCRIPTS_DIR);
   callbacks_dir = strdup(CONST_DEFAULT_CALLBACKS_DIR);
   config_file_path = ndpi_proto_path = NULL;
+<<<<<<< HEAD
   http_port = CONST_DEFAULT_NTOP_PORT, alt_http_port = 0;
   http_prefix = strdup(""), zmq_encryption_pwd = NULL;
   instance_name = NULL;
   categorization_enabled = false, enable_users_login = true;
   categorization_key = NULL, zmq_encryption_pwd = NULL;
   es_index = es_url = es_user = es_pwd = NULL;
+=======
+  http_port = CONST_DEFAULT_NTOP_PORT;
+  http_prefix = strdup("");
+>>>>>>> dc3872b88c463aa5e5ba333fd357c8641f72c283
   https_port = 0; // CONST_DEFAULT_NTOP_PORT+1;
   change_user = true, daemonize = false;
   user = strdup(CONST_DEFAULT_NTOP_USER);
@@ -1038,9 +1047,14 @@ int Prefs::setOption(int optkey, char *optarg) {
 	   );
     printf("GIT rev:   %s\n", NTOPNG_GIT_RELEASE);
 #ifdef NTOPNG_PRO
+<<<<<<< HEAD
     printf("Pro rev:   %s\n", NTOPNG_PRO_GIT_RELEASE);
     printf("System Id: %s\n", ntop->getPro()->get_system_id());
     printf("Built on:  %s\n", PACKAGE_OS);
+=======
+    printf("Pro rev:   %s\n", NTOPNG_PRO_SVN_RELEASE);
+    printf("System Id: %s\n", ntop->getPro()->get_system_id());
+>>>>>>> dc3872b88c463aa5e5ba333fd357c8641f72c283
 #endif
     exit(0);
     break;

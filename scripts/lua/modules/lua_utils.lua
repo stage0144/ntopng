@@ -1713,6 +1713,13 @@ function version2int(v)
     major = e[1]
     minor = e[2]
     veryminor = e[3]
+<<<<<<< HEAD
+=======
+    
+    if(major == nil or tonumber(major) == nil or type(major) ~= "string")     then major = 0 end
+    if(minor == nil or tonumber(minor) == nil or type(minor) ~= "string")     then minor = 0 end
+    if(veryminor == nil or tonumber(veryminor) == nil or type(veryminor) ~= "string") then veryminor = 0 end
+>>>>>>> dc3872b88c463aa5e5ba333fd357c8641f72c283
 
     if(major == nil or tonumber(major) == nil or type(major) ~= "string")     then major = 0 end
     if(minor == nil or tonumber(minor) == nil or type(minor) ~= "string")     then minor = 0 end
@@ -2295,6 +2302,7 @@ function get_symbolic_mac(mac_address, only_symbolic)
    end
 end
 
+<<<<<<< HEAD
 function get_manufacturer_mac(mac_address)
   local m = string.sub(mac_address, 1, 8)
   local ret = get_mac_classification(m, true --[[ extended name --]])
@@ -3210,3 +3218,27 @@ end
 -- defined in this file
 --
 http_lint = require "http_lint"
+=======
+function makeTopStatsScriptsArray()
+   path = dirs.installdir .. "/scripts/lua/modules/top_scripts"
+   path = fixPath(path)
+   local files = ntop.readdir(path)
+   topArray = {}
+
+   for k,v in pairs(files) do
+      if(v ~= nil) then
+	 value = {}
+	 fn,ext = v:match("([^.]+).([^.]+)")
+	 mod = require("top_scripts."..fn)
+	 if(type(mod) ~= type(true)) then
+            value["name"] = mod.name
+            value["script"] = mod.infoScript
+            value["key"] = mod.infoScriptKey
+            value["levels"] = mod.numLevels
+            topArray[fn] = value
+	 end
+      end
+   end
+   return(topArray)
+end
+>>>>>>> dc3872b88c463aa5e5ba333fd357c8641f72c283

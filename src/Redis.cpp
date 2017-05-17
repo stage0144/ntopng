@@ -54,6 +54,13 @@ Redis::~Redis() {
 
 /* **************************************** */
 
+void Redis::startFlowDump() {
+  if(ntop->getPrefs()->do_dump_flows_on_es())
+    pthread_create(&esThreadLoop, NULL, esLoop, (void*)this);
+}
+
+/* **************************************** */
+
 void Redis::reconnectRedis() {
   struct timeval timeout = { 1, 500000 }; // 1.5 seconds
   redisReply *reply;

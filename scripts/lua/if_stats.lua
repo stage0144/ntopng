@@ -23,11 +23,15 @@ require "graph_utils"
 require "alert_utils"
 require "db_utils"
 
+<<<<<<< HEAD
 if ntop.isPro() then
    shaper_utils = require("shaper_utils")
 end
 
 sendHTTPContentTypeHeader('text/html')
+=======
+sendHTTPHeader('text/html; charset=iso-8859-1')
+>>>>>>> dc3872b88c463aa5e5ba333fd357c8641f72c283
 
 page = _GET["page"]
 ifid = _GET["ifid"]

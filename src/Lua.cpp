@@ -258,9 +258,15 @@ static NetworkInterface* getCurrentInterface(lua_State* vm) {
 
   ntop->getTrace()->traceEvent(TRACE_DEBUG, "%s() called", __FUNCTION__);
 
+<<<<<<< HEAD
   lua_getglobal(vm, "ntop_interface");
   if((ntop_interface = (NetworkInterface*)lua_touserdata(vm, lua_gettop(vm))) == NULL) {
     ntop_interface = handle_null_interface(vm);
+=======
+  lua_getglobal(vm, CONST_NTOP_INTERFACE);
+  if((ntop_interface = (NetworkInterfaceView*)lua_touserdata(vm, lua_gettop(vm))) == NULL) {
+    ntop_interface = handle_null_interface_view(vm);
+>>>>>>> dc3872b88c463aa5e5ba333fd357c8641f72c283
   }
 
   return(ntop_interface);
@@ -286,8 +292,13 @@ static int ntop_select_interface(lua_State* vm) {
     ifname = (char*)lua_tostring(vm, 1);
   }
 
+<<<<<<< HEAD
   lua_pushlightuserdata(vm, (char*)ntop->getNetworkInterface(vm, ifname));
   lua_setglobal(vm, "ntop_interface");
+=======
+  lua_pushlightuserdata(vm, (char*)ntop->getNetworkInterfaceView(ifname));
+  lua_setglobal(vm, CONST_NTOP_INTERFACE);
+>>>>>>> dc3872b88c463aa5e5ba333fd357c8641f72c283
 
   return(CONST_LUA_OK);
 }
@@ -3869,6 +3880,7 @@ static int ntop_get_info(lua_State* vm) {
   snprintf(rsp, sizeof(rsp), "%s [%s][%s]",
 	   PACKAGE_OSNAME, PACKAGE_MACHINE, PACKAGE_OS);
   lua_push_str_table_entry(vm, "platform", rsp);
+<<<<<<< HEAD
   lua_push_str_table_entry(vm, "OS",
 #ifdef WIN32
 			   (char*)"Windows"
@@ -3876,6 +3888,8 @@ static int ntop_get_info(lua_State* vm) {
 			   (char*)PACKAGE_OS
 #endif
 			   );
+=======
+>>>>>>> dc3872b88c463aa5e5ba333fd357c8641f72c283
   lua_push_int_table_entry(vm, "bits", (sizeof(void*) == 4) ? 32 : 64);
   lua_push_int_table_entry(vm, "uptime", ntop->getGlobals()->getUptime());
   lua_push_str_table_entry(vm, "command_line", ntop->getPrefs()->get_command_line());

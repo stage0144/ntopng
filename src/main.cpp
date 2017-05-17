@@ -227,6 +227,8 @@ int main(int argc, char *argv[])
   } /* for */
 
   ntop->createExportInterface();
+  
+  ntop->getRedis()->startFlowDump();
 
   ntop->getElasticSearch()->startFlowDump();
   ntop->getLogstash()->startFlowDump();

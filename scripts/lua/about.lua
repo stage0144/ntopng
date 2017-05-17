@@ -48,6 +48,7 @@ if(info["pro.systemid"] and (info["pro.systemid"] ~= "")) then
    print("\" target=\"_blank\">".. info["pro.systemid"] .."</A> <i class='fa fa-external-link'></i> ]")
 
 print [[
+<<<<<<< HEAD
     <br><small>]]
 print(i18n("about.licence_generation", {
 	      purchase_url='http://shop.ntop.org/',
@@ -55,6 +56,11 @@ print(i18n("about.licence_generation", {
 }))
 
 print[[</small>
+=======
+    <br><small>Click on the above URL to generate your professional version license, or 
+	       <br>purchase a license at <A HREF=http://shop.ntop.org/>e-shop</A>. If you are no-profit, research or an education<br>
+institution please read <A HREF=http://www.ntop.org/about/about-us-2/>this</A>.</small>
+>>>>>>> dc3872b88c463aa5e5ba333fd357c8641f72c283
 	 <p>
    ]]
 
@@ -82,7 +88,11 @@ print("</td></tr>")
 
 vers = string.split(info["version.git"], ":")
 if((vers ~= nil) and (vers[2] ~= nil)) then
+<<<<<<< HEAD
    ntopng_git_url = "<A HREF=\"https://github.com/ntop/ntopng/commit/".. vers[2] .."\">"..info["version"].."</A>"
+=======
+   ntopng_git_url = "<A HREF=https://github.com/ntop/ntopng/commit/".. vers[2] ..">"..info["version"].."</A>"
+>>>>>>> dc3872b88c463aa5e5ba333fd357c8641f72c283
 else
    ntopng_git_url = info["version"]
 end
@@ -105,12 +115,19 @@ end
 
 print(" Edition</td></tr>\n")
 
+<<<<<<< HEAD
 if((info["OS"] ~= nil) and (info["OS"] ~= "")) then
    print("<tr><th>"..i18n("about.built_on").."</th><td>"..info["OS"].."</td></tr>\n") 
 end
 
 
 --print("<tr><th colspan=2 align=center>&nbsp;</th></tr>\n")
+=======
+print("<tr><th>Platform</th><td>"..info["platform"].." - "..info["bits"] .." bit</td></tr>\n")
+print("<tr><th>Currently Logged User</th><td><i class='fa fa-user fa-lg'></i> ".._SESSION["user"].."</td></tr>\n")
+print("<tr><th>Uptime</th><td><i class='fa fa-clock-o fa-lg'></i> "..secondsToTime(info["uptime"]).."</td></tr>\n")
+print("<tr><th colspan=2 align=center>&nbsp;</th></tr>\n")
+>>>>>>> dc3872b88c463aa5e5ba333fd357c8641f72c283
 
 ndpi_ver = info["version.ndpi"]
 if (ndpi_ver ~= nil) then

@@ -21,12 +21,20 @@ else
   fi
 fi
 
+<<<<<<< HEAD
 if [ test -d ../../pro/ ] && [ ! test -f ../../pro/utils/snzip ]; then
    echo "snzip is missing: please compile it and try again"
    exit
 fi
 
 if [ test -f /usr/bin/lsb_release ] && [ test -d $HOME/PF_RING ]; then
+=======
+if [ test -f /usr/bin/lsb_release ]; then
+  EXTRA_DEPS=", libnuma1, libzmq3"
+  PFRING_VERS=`cat $HOME/PF_RING/kernel/linux/pf_ring.h | grep RING_VERSION | head -1 | cut -d '"' -f 2`
+  PFRING_RELEASE=`cd $HOME/PF_RING ; git rev-list --all |wc -l | tr -d '[[:space:]]'`
+  PFRING_DEP=", pfring (=$PFRING_VERS-$PFRING_RELEASE)"
+>>>>>>> dc3872b88c463aa5e5ba333fd357c8641f72c283
   UBUNTU_RELEASE=`lsb_release -r|cut -f 2`
   UBUNTU_SUB_RELEASE=`echo $UBUNTU_RELEASE|cut -f 1 -d '.'`
   if test "$UBUNTU_RELEASE" = "16.04"; then
@@ -60,6 +68,7 @@ else
   SUDO="sudo"
 fi
 
+<<<<<<< HEAD
 CHOWN="$SUDO chown $USER:$GROUP ../ntopng_*deb"
 
 SHORT_MACHINE=`uname -m | cut -b1-3`
@@ -69,6 +78,12 @@ else
   if test $SHORT_MACHINE = "arm"; then
     UBUNTU_RELEASE="arm"
   fi
+=======
+if [ -n "$USER" ]; then
+CHOWN="$SUDO chown ${USER}{$GROUP} ../ntopng_*deb"
+else
+CHOWN="@echo \"\""
+>>>>>>> dc3872b88c463aa5e5ba333fd357c8641f72c283
 fi
 
 /bin/rm -f debian.ntopng/control.in
