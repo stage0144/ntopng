@@ -520,7 +520,7 @@ void Flow::processDetectedProtocol() {
     
     /* rajout de la version du ssl */
   
-	if(protos.ssl.version == NULL)
+	if((protos.ssl.version == NULL) && (&ndpiFlow->packet != '\0'))
 	{
 		struct ndpi_packet_struct *packet = &ndpiFlow->packet;
 		if(packet->payload[0] == 0x16){ // on récupère la version serveur du SSL si il y a un Handshake
