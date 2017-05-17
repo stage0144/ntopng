@@ -417,7 +417,7 @@ print[[
         return true;
 
       recheckFields(input);
-      return is_mac_address(member) || is_network_mask(member, true);
+      return memberValueValidator(input);
     }
   
     function memberValidator(input) {
@@ -516,7 +516,7 @@ print [[
       var member_id = addedMemberCtr++;
       var newid = "member_" + member_id;
 
-      var tr = $('<tr id=' + newid + '><td>]] printMemberAddressField('member_id') print[[</td><td class="text-center">]] printMemberVlanField('member_id') print[[</td><td>]] printAliasField('member_id') print[[</td><td>]] printIconField('member_id') print[[</td><td class="text-center text-middle]] if not (isCaptivePortalActive()) then print(" hidden") end print[[">Persistent</td><td class="text-center"></td></tr>');
+      var tr = $('<tr id=' + newid + '><td>]] printMemberAddressField('member_id') print[[</td><td class="text-center">]] printMemberVlanField('member_id') print[[</td><td>]] printAliasField('member_id') print[[</td><td>]] printIconField('member_id') print[[</td><td class="text-center ]] if not (isCaptivePortalActive()) then print(" hidden") end print[[">Persistent</td><td class="text-center"></td></tr>');
       datatableAddDeleteButtonCallback.bind(tr)(6, "datatableUndoAddRow('#" + newid + "', ']] print(i18n("host_pools.empty_pool")) print[[', '#addPoolMemberBtn', 'decPoolMembers')", "]] print(i18n('undo')) print[[");
       $("#table-manage table").append(tr);
       $("input", tr).first().focus();
@@ -597,7 +597,6 @@ end
 print[[            css : {
                width: '10%',
                textAlign: 'center',
-               verticalAlign: 'middle',
             }
          }, {
             title: "]] print(i18n("actions")) print[[",
@@ -870,6 +869,7 @@ print [[
             css : {
                width: '7%',
                textAlign: 'center',
+               whiteSpace: 'nowrap',
             }
          }, {
             title: "]] print(i18n("host_pools.enforce_quotas_per_pool_member")) print[[",

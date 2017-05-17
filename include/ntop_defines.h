@@ -160,7 +160,6 @@
 #define STDIN_IFACE_ID          (MAX_NUM_INTERFACES-3)
 #define MAX_CSRF_DURATION       300 /* 5 mins */
 #define NTOP_NOLOGIN_USER	"nologin"
-<<<<<<< HEAD
 #define MAX_OPTIONS             24
 #define CONST_ADMINISTRATOR_USER      "administrator"
 #define CONST_UNPRIVILEGED_USER       "unprivileged"
@@ -176,22 +175,6 @@
 #define CONST_ALLOWED_NETS            "allowed_nets"
 #define CONST_ALLOWED_IFNAME          "allowed_ifname"
 #define CONST_USER                     "user"
-=======
-
-#define CONST_SAVE_HTTP_FLOWS_TRAFFIC "ntopng.prefs.http_traffic_dump"
-
-#define CONST_ADMINISTRATOR_USER  "administrator"
-#define CONST_UNPRIVILEGED_USER   "unprivileged"
-#define CONST_STR_NTOPNG_LICENSE  "ntopng.license"
-#define CONST_STR_USER_GROUP      "ntopng.user.%s.group"
-#define CONST_STR_USER_FULL_NAME  "ntopng.user.%s.full_name"
-#define CONST_STR_USER_PASSWORD   "ntopng.user.%s.password"
-#define CONST_STR_USER_NETS       "ntopng.user.%s.allowed_nets"
-#define CONST_ALLOWED_NETS        "allowed_nets"
-#define CONST_USER                "user"
-#define CONST_ES_QUEUE_NAME       "ntopng.es"
-#define CONST_NTOP_INTERFACE      "ntop_interface"
->>>>>>> dc3872b88c463aa5e5ba333fd357c8641f72c283
 
 #define CONST_INTERFACE_TYPE_PCAP      "pcap"
 #define CONST_INTERFACE_TYPE_PCAP_DUMP "pcap dump"
@@ -613,7 +596,7 @@
 #define STORE_MANAGER_MAX_QUERY              1024
 #define STORE_MANAGER_MAX_KEY                20
 #define DEFAULT_GLOBAL_DNS                   ""
-#define DEFAULT_SAFE_SEARCH_DNS              "208.67.222.123"
+#define DEFAULT_SAFE_SEARCH_DNS              "208.67.222.123" /* OpenDNS Family Shield */
 #define ALERTS_MANAGER_MAX_ENTITY_ALERTS     1024
 #define ALERTS_MANAGER_MAX_FLOW_ALERTS       16384
 #define ALERTS_MANAGER_TABLE_NAME            "closed_alerts"
@@ -683,7 +666,9 @@
 /* Macros */
 #define COUNT_OF(x) ((sizeof(x)/sizeof(0[x])) / ((size_t)(!(sizeof(x) % sizeof(0[x])))))
 
+#ifndef _STATIC_ASSERT
 #define _STATIC_ASSERT(COND,MSG) typedef char static_assertion_##MSG[(!!(COND))*2-1]
+#endif
 #define _COMPILE_TIME_ASSERT3(X,L) _STATIC_ASSERT(X,static_assertion_at_line_##L)
 #define _COMPILE_TIME_ASSERT2(X,L) _COMPILE_TIME_ASSERT3(X,L)
 #define COMPILE_TIME_ASSERT(X)     _COMPILE_TIME_ASSERT2(X,__LINE__)

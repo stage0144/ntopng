@@ -443,7 +443,7 @@ if((page == "overview") or (page == nil)) then
       historicalProtoHostHref(getInterfaceId(ifname), host["ip"], nil, nil, nil)
       
       if(host["local_network_name"] ~= nil) then
-	 print(" [&nbsp;<A HREF='"..ntop.getHttpPrefix().."/lua/flows_stats.lua?network="..host["local_network_id"].."'>".. host["local_network_name"].."</A>&nbsp;]")
+	 print(" [&nbsp;<A HREF='"..ntop.getHttpPrefix().."/lua/network_details.lua?network="..host["local_network_id"].."&page=historical'>".. host["local_network_name"].."</A>&nbsp;]")
       end
 
       if((host["city"] ~= nil) and (host["city"] ~= "")) then
@@ -478,65 +478,10 @@ if((page == "overview") or (page == nil)) then
       print("</th><td colspan=2><A HREF="..ntop.getHttpPrefix().."/lua/hosts_stats.lua?vlan="..host["vlan"]..">"..host["vlan"].."</A></td></tr>\n")
    end
 
-<<<<<<< HEAD
    if(host["os"] ~= "") then
       print("<tr>")
       if(host["os"] ~= "") then
          print("<th>OS</th><td> <A HREF='"..ntop.getHttpPrefix().."/lua/hosts_stats.lua?os=" .. string.gsub(host["os"], " ", '%%20').. "'>"..mapOS2Icon(host["os"]) .. "</A></td><td></td>\n")
-=======
-   if(ifstats.iface_inline and (host.localhost or host.systemhost)) then
-      print("<tr><th>Host Traffic Policy</th><td>")
-      print('<div class="dropdown">')
-
-      if(host["l7_traffic_policy"] ~= nil) then
-print [[
-      <button class="btn btn-default btn-xs dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-expanded="true">
-        Blacklisted Protocols
-        <span class="caret"></span>
-      </button>
-      <ul class="dropdown-menu" role="menu">
-]]
-
-	 for k,v in pairs(host["l7_traffic_policy"]) do
-	    print('<li role="presentation"><a role="menuitem" tabindex="-1">'..k.."</a></li>\n")
-	 end
-
-	 print("</ul>")
-      end
-
-      print('<A class="btn btn-default btn-xs" HREF="'..ntop.getHttpPrefix()..'/lua/if_stats.lua?page=filtering&network='..host["ip"])
-      if(host["ip"]:match(":")) then print("/128") else print("/32") end
-      if(host["vlan"] ~= nil) then print("@"..host["vlan"]) end
-      print('">Modify Host Traffic Policy</A></div>')
-
-      if(host["bridge.ingress_shaper_id"] ~= nil) then
-	 shaper_key = "ntopng.prefs.".. ifId ..".shaper_max_rate"
-	 ingress_max_rate = ntop.getHashCache(shaper_key, host["bridge.ingress_shaper_id"])
-	 egress_max_rate = ntop.getHashCache(shaper_key, host["bridge.egress_shaper_id"])
-	 print("<p><table class=\"table table-bordered table-striped\"width=100%>")
-	 print("<tr><th>Ingress Policer</th><td>"..maxRateToString(ingress_max_rate).."</td></tr>")
-	 print("<tr><th>Egress Policer</th><td>"..maxRateToString(egress_max_rate).."</td></tr>")
-         print("</table>")
-      end
-
-      print('</td>')
-
-      print('<td>')
-      if(host["localhost"] == true) then
-	 drop_traffic = ntop.getHashCache("ntopng.prefs.drop_host_traffic", host_key)
-	 if(drop_traffic == "true") then
-	    drop_traffic_checked = 'checked="checked"'
-	    drop_traffic_value = "false" -- Opposite
-	 else
-	    drop_traffic_checked = ""
-	    drop_traffic_value = "true" -- Opposite
-	 end
-
-	 print('<form id="alert_prefs" class="form-inline" style="margin-bottom: 0px;"><input type="hidden" name="host" value="'..host_info["host"])
-	 print('"><input type="hidden" name="drop_host_traffic" value="'..drop_traffic_value..'"><input type="checkbox" value="1" '..drop_traffic_checked..' onclick="this.form.submit();"> Drop All Host Traffic</input>')
-	 print('<input id="csrf" name="csrf" type="hidden" value="'..ntop.getRandomCSRFValue()..'" />\n')
-	 print('</form>')
->>>>>>> dc3872b88c463aa5e5ba333fd357c8641f72c283
       else
          print("<th></th><td></td>\n")
       end
@@ -2193,43 +2138,11 @@ else
    rrdfile=_GET["rrd_file"]
 end
 
-<<<<<<< HEAD
 host_url = "host="..host_ip
 host_key = host_ip
 if(host_vlan and (host_vlan > 0)) then
    host_url = host_url.."&vlan="..host_vlan
    host_key = host_key.."@"..host_vlan
-=======
-drawRRD(ifId, hostinfo2hostkey(host_info), rrdfile, _GET["graph_zoom"], ntop.getHttpPrefix()..'/lua/host_details.lua?ifname='..ifId..'&'..hostinfo2url(host_info)..'&page=historical', 1, _GET["epoch"], nil, makeTopStatsScriptsArray())
-
-elseif(page == "aggregations") then
-print [[
-      <div id="table-hosts"></div>
-	 <script>
-   var url_update = ]]
-print (ntop.getHttpPrefix())
-print [["/lua/get_hosts_data.lua?aggregated=1]]
-   print("&protocol="..protocol_id.."&client="..host_info["host"]) print ('";')
-
-ntop.dumpFile(dirs.installdir .. "/httpdocs/inc/aggregated_hosts_stats_id.inc")
-
-  print [[
-   $("#table-hosts").datatable({
-      title: "Client Host Aggregations",
-      url: url_update , ]]
-
-print ('rowCallback: function ( row ) { return aggregated_host_table_setID(row); },')
-
-print [[
-      showPagination: true,
-      buttons: [ '<div class="btn-group"><button class="btn btn-link dropdown-toggle" data-toggle="dropdown">Aggregations<span class="caret"></span></button> <ul class="dropdown-menu" role="menu" style="min-width: 110px;"><li><a href="]]
-print (ntop.getHttpPrefix())
-print [[/lua/aggregated_hosts_stats.lua">All</a></li> ]]
-
-families = interface.getAggregationFamilies()
-for key,v in pairs(families["families"]) do
-   print('<li><a href="'..ntop.getHttpPrefix()..'/lua/host_details.lua?ifname='..ifId..'&'..hostinfo2url(host_info) ..'&page=aggregations&protocol=' .. v..'">'..key..'</a></li>')
->>>>>>> dc3872b88c463aa5e5ba333fd357c8641f72c283
 end
 drawRRD(ifId, host_key, rrdfile, _GET["zoom"], ntop.getHttpPrefix()..'/lua/host_details.lua?ifid='..ifId..'&'..host_url..'&page=historical', 1, _GET["epoch"], nil, makeTopStatsScriptsArray())
 elseif(page == "traffic_report") then

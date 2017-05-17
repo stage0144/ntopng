@@ -69,6 +69,15 @@ local  en = {
    icmp = "ICMP",
    arp = "ARP",
    percentage = "Percentage",
+   previous = "Previous",
+   ["next"] = "Next",
+   abort = "Abort",
+   chart = "Chart",
+   ingress = "Ingress",
+   egress = "Egress",
+   mac_address = "MAC Address",
+   as_number = "AS number",
+   asn = "ASN",
 
    graphs = {
       arp_requests = "ARP Requests",
@@ -245,6 +254,7 @@ local  en = {
       last_hour = "Last Hour",
       last_day = "Last Day",
       delete_alerts_configuration = "Delete Alerts Configuration",
+      delete_config_btn = "Delete Local %{conf}s Common Configuration",
       delete_config_message = "Do you really want to delete the common %{granularity} alerts configuration of local %{conf}s",
       delete_all = "Delete All",
       iface_delete_config_btn = "Delete Interface %{iface} Configuration",
@@ -264,6 +274,13 @@ local  en = {
             "<li>Persistent alerts SQLite storage</li>"..
             "</ul><br>Do you really want to proceed",
       flush_data = "Flush Data",
+      minute = "Minute",
+      five_minutes = "Five minutes",
+      hourly = "Hourly",
+      daily = "Daily",
+      startup = "Startup",
+      no_recorded_alerts_message = "No recorded alerts for interface %{ifname}",
+      alerts_are_disabled_message = "Alerts are disabled. Please check the preferences page to enable them.",
    },
 
    alerts_dashboard = {
@@ -439,6 +456,10 @@ local  en = {
    },
 
    snmp = {
+      snmp_device = "SNMP Device",
+      view_device = "View Device",
+      snmp_interface = "SNMP Interface",
+      note = "NOTE",
       bound_interface_description = "Binding a network interface to an SNMP interface is useful to compare network traffic monitored by ntopng with that reported by SNMP",
    },
 
@@ -455,6 +476,8 @@ local  en = {
    about = {
       about = "About",
       licence = "License",
+      cpu_load = "CPU load",
+      ram_memory = "RAM",
       version = "Version",
       licence_generation = "Click on the above URL to generate your professional version license, or <br>purchase a license at <a href=\"%{purchase_url}\">e-shop</a>. If you are no-profit, research or an education<br>institution please read <a href=\"%{universities_url}\">this</a>.",
       specify_licence = "Specify here your ntopng License",
@@ -695,7 +718,8 @@ local  en = {
       safe_search_dns_description = "The DNS server to be used to perform <a href='%{url}'>Safe Search</a> queries.<br>"..
             "Safe Search can be enabled for individual host pools from the host pools configuration page. Default: 208.67.222.123.",
       global_dns_title = "Global DNS",
-      global_dns_description = "A DNS server to redirect the clients DNS requests to. If empty, the redirection is disabled and the default DNS is used.",
+      global_dns_description = "A DNS server to redirect the clients DNS requests to. If empty, the redirection is disabled and the default DNS is used.<br>"..
+            "Here is a list of featured DNS secure servers:",
    },
 
    entity_thresholds = {
@@ -796,7 +820,6 @@ local  en = {
    },
 
    packetdump_page = {
-      packets_dumped = "packets dumped",
       packet_dump = "Packet Dump",
       dump_all_traffic = "Dump All Traffic",
       packet_dump_to_disk = "Packet Dump To Disk",
@@ -805,7 +828,7 @@ local  en = {
       dump_traffic_to_disk_on_security_alert = "Dump Traffic To Disk On Security Alert",
       packet_dump_to_tap = "Packet Dump To Tap",
       dump_traffic_to_tap = "Dump Traffic To Tap",
-      packets_dumped = "packets dumped",
+      num_dumped_packets = "%{num_pkts} packets dumped",
       packet_dump_to_tap_disabled_message = "Disabled. Please restart ntopng with --enable-taps",
       sampling_rate = "Sampling Rate",
       note = "NOTE",
@@ -834,7 +857,192 @@ local  en = {
       scaling_factor = "Scaling Factor",
       scaling_factor_popup_msg = "This should match your capture interface sampling rate",
       trigger_interface_alerts = "Trigger Interface Alerts",
-      trigger_alerts = "Trigger alerts for Interface",
+      trigger_alerts_for_interface = "Trigger alerts for Interface %{ifname}",
+   },
+
+   bridge_wizard = {
+      intro_1 = "This wizard will help you to setup some basic configuration to enable bridge specific features of ntopng.",
+      start = "Start",
+      captive_portal_available = "The captive portal is available but <b>not running</b>.",
+      captive_portal_running = "Note: the captive portal is <b>up and running</b>.",
+      captive_portal_unavailable = "Note: the captive portal is <b>not available</b>.<br>Check the -w command line parameter e.g. -w 80,3000",
+      warning_configuration_exist = "A bridge configuration already exists. It will be discarder after clicking the save button.",
+      click_on_next = "Click on the Next button to proceed.",
+      check_doc = "Instructions on properly configuring the bridge can be found <a href='%{url}'>on our github docs</a>.",
+      configure_host_pools = "Host Pool",
+      host_pool_info = "An host pool represents an aggregation of network hosts.<br>You need to create an host pool to start applying traffic policies to it.",
+      pool_member = "New Pool Member",
+      configure_user = "Captive Portal",
+      configure_user_message = "A new ntopng user must be created to be associated to the captive portal.",
+      username = "Username",
+      username_title = "The username your clients will use to login",
+      password = "Password",
+      password_title = "The password your clients will use to login",
+      member_placeholder = "IP address, network (e.g. 192.168.1.0/24), or MAC address",
+      policy = "Policy",
+      define_policy = "When running in bridge mode, it is possible to limit the traffic flowing through the bridge by the mean of traffic policies.<br><br>"..
+            "You can define an initial set of policies to be applied on the bridge from one of the presets below:",
+      fine_tune = "You can fine tune the specific policies at any time through the <a href='%{url}'>Traffic Policy</a> page.",
+      done = "Apply",
+      configuration_complete = "You are going to apply the specified settings on the bridge.<br><br>"..
+            "Click on the save button below to apply the configured settings.<br><br><br>"..
+            "You can access more advanced settings from the following pages:",
+      host_pools_config = "Host Pools",
+      policies_config = "Traffic Policies, Shaping and Quotas",
+      captive_portal_users = "Captive Portal Users",
+      business_preset = "Business: no P2P, limited social networks and games time",
+      children_preset = "Children: Safe Search enabled, limited games time",
+      no_preset = "Do not use a preset",
+   },
+
+   alerts_thresholds_config = {
+      every_minute = "Every Minute",
+      every_5_minutes = "Every 5 Minutes",
+      hourly = "Hourly",
+      daily = "Daily",
+      activity_time = "Activity Time",
+      dns_traffic = "DNS Traffic",
+      idle_time = "Idle Time",
+      p2p_traffic = "P2P Traffic",
+      throughput = "Throughput",
+      inner_traffic = "Inner Traffic",
+      ingress_traffic = "Ingress Traffic",
+      egress_traffic = "Egress Traffic",
+      threshold_type = "Threshold Type",
+      thresholds_single_source = "%{source} %{alt_name} Thresholds",
+      common_thresholds_local_sources = "Local %{source}s Common Thresholds",
+      alert_active_description = "Activity time since last check (seconds).",
+      alert_bytes_description = "Layer 2 bytes delta (sent + received)",
+      alert_dns_description = "Layer 2 bytes delta (sent + received) for DNS detected traffic",
+      alert_idle_description = "Idle time since last packet seen (seconds)",
+      alert_packets_description = "Packets delta (sent + received)",
+      alert_p2p_description = "Layer 2 bytes delta (sent + received) for peer-to-peer detected traffic",
+      alert_throughput_description = "Average throughput (sent + received) [Mbps]",
+      alert_flows_description = "Flows delta (as client + as server)",
+      alert_network_ingress_description = "Ingress Bytes delta",
+      alert_network_egress_description = "Egress Bytes delta",
+      alert_network_inner_description = "Inner Bytes delta",
+      notes = "NOTES",
+      note_control_threshold_checks_periods ="Thresholds listed in these tabs are checked periodically. Use tabs to control threshold checks periods.",
+      note_thresholds_expressed_as_delta = "Some thresholds are expressed as a delta. A delta is the difference of the same quantity between two consecutive checks.",
+      note_consecutive_checks = "Consecutive checks are not necessarily performed on consecutive periods. For example, if an host goes idle, its thresholds will not be checked until it becomes active again.",
+      note_deltas_of_idle_host_become_active = "Deltas of an idle host that becomes active again will be computed as the difference of the same quantity during the latest check and the most recent check performed when the host was active before going idle.",
+      note_attacker_victime_threshold = "An attacker/victim threshold is considered exceeded if the corresponding host has exceeded the configured threshold for at least three seconds when performing the periodic check.",
+   },
+
+   mac_stats = {
+      layer_2_host_devices = "Layer 2 Host Devices",
+      all_layer_2_devices = "All Layer 2 Devices",
+      layer_2_devices_with_manufacturer = "%{title} from '%{manufacturer}' manufacturer",
+      filter_macs = "Filter MACs",
+      manufacturer = "Manufacturer",
+      all_devices = "All Devices",
+      hosts_only = "Hosts Only",
+      all_manufacturers = "All Manufacturers",
+   },
+
+   details = {
+      first_last_seen = "First / Last Seen",
+      sent_vs_received_traffic_breakdown = "Sent vs Received Traffic Breakdown",
+      traffic_sent_received = "Traffic Sent / Received",
+      address_resolution_protocol = "Address Resolution Protocol",
+      show_hosts = "Show Hosts",
+      arp_requests = "ARP Requests",
+      arp_replies = "ARP Replies",
+      ago = "ago",
+      rcvd = "Rcvd",
+   },
+
+   mac_details = {
+      mac = "Mac",
+      mac_parameter_missing_message = "Mac parameter is missing (internal error ?)",
+      mac_cannot_be_found_message = "Mac %{mac} cannot be found.",
+   },
+
+   network_details = {
+      network = "Network",
+      network_parameter_missing_message = "Network parameter is missing (internal error ?)",
+      no_available_stats_for_network = "No available stats for network %{network}",
+   },
+
+   network_alert_config = {
+      trigger_network_alerts = "Trigger Network Alerts",
+      trigger_alerts_for_network = "Trigger alerts for Network %{network}",
+   },
+
+   local_flow_matrix = {
+      local_hosts_active_flows_matrix = "Local Hosts Active Flows Matrix",
+      error_no_local_hosts = "No local hosts can be found",
+   },
+
+   tree_map = {
+      hosts_treemap = "Hosts TreeMap",
+   },
+
+   geo_map = {
+      hosts_geomap = "Hosts GeoMap",
+   },
+
+   top_hosts = {
+      top_hosts_local = "Top Hosts (Local)",
+   },
+
+   http_servers_stats = {
+      local_http_servers = "Local HTTP Servers",
+      http_virtual_host = "HTTP Virtual Host",
+      http_server_ip = "HTTP Server IP",
+   },
+
+   local_hosts_stats = {
+      looking_glass = "Looking Glass",
+      criteria = "Criteria",
+   },
+
+   os_stats = {
+      hosts_by_operating_system = "Hosts by Operating System",
+   },
+
+   country_stats = {
+      hosts_by_country = "Hosts by Country",
+   },
+
+   as_stats = {
+      autonomous_systems = "Autonomous Systems",
+   },
+
+   pool_stats = {
+      host_pool_list = "Host Pool List",
+   },
+
+   network_stats = {
+      networks = "Networks",
+      networks_traffic_with_ipver = "%{networks} with IPv%{ipver} traffic",
+      network_list = "Network List",
+      network_name = "Network Name",
+   },
+
+   hosts_stats = {
+      ipver_title = "IPv%{version_num}",
+      asn_title = "for AS %{asn}",
+      country_title = "for Country %{country}",
+      mac_title = "with Mac %{mac}",
+      pool_title = "for Pool %{poolname}",
+      vlan_title = "VLAN %{vlan}",
+      hosts = "Hosts",
+      as_info = "AS Info",
+      as_path = "AS Path",
+      as_geolocation = "AS Geolocation",
+      as_prefixes = "AS Prefixes",
+      bgp_updates = "BGP Updates",
+      filter_hosts = "Filter Hosts",
+      all_hosts = "All Hosts",
+      local_hosts_only = "Local Hosts Only",
+      remote_hosts_only = "Remote Hosts Only",
+      host_pool = "Host Pool %{pool_name}",
+      source_id = "Source Id",
+      location = "Location",
+      httpbl = "HTTP:BL",
+      more_info_about_as_popup_msg = "More Information about AS",
    },
 
    noTraffic = "No traffic has been reported for the specified date/time selection",
@@ -842,6 +1050,7 @@ local  en = {
       "<br>If you still want data with such granularity, please tune <a href=\"%{prefs}\">Protocol/Networks Timeseries</a> preferences",
    error_no_search_results = "No results found. Please modify your search criteria.";
    enterpriseOnly = "This feature is only available in the ntopng enterprise edition",
+   no_results_found = "No results found",
 
    uploaders = "Upload Volume",
    downloaders = "Download Volume",

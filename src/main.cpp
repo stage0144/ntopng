@@ -168,7 +168,7 @@ int main(int argc, char *argv[])
       } else {
 	iface = NULL;
 
-#if defined(NTOPNG_PRO) and !defined(WIN32)
+#if defined(NTOPNG_PRO) && !defined(WIN32)
 	if(strncmp(ifName, "bridge:", 7) == 0)
 	  iface = new PacketBridge(ifName);
 #endif
@@ -227,8 +227,6 @@ int main(int argc, char *argv[])
   } /* for */
 
   ntop->createExportInterface();
-  
-  ntop->getRedis()->startFlowDump();
 
   ntop->getElasticSearch()->startFlowDump();
   ntop->getLogstash()->startFlowDump();
@@ -315,10 +313,12 @@ int main(int argc, char *argv[])
   ntop->getTrace()->traceEvent(TRACE_NORMAL, "Scripts/HTML pages directory: %s",
 			       ntop->get_install_dir());
 
+#ifndef WIN32
   signal(SIGHUP,  sighup);
   signal(SIGINT,  sigproc);
   signal(SIGTERM, sigproc);
   signal(SIGINT,  sigproc);
+#endif
 
 #if defined(WIN32) && defined(DEMO_WIN32)
   ntop->getTrace()->traceEvent(TRACE_NORMAL, "-----------------------------------------------------------");

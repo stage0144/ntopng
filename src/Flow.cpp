@@ -111,16 +111,10 @@ Flow::Flow(NetworkInterface *_iface,
       allocDPIMemory();
     break;
 
-<<<<<<< HEAD
   case IPPROTO_ICMP:
     ndpiDetectedProtocol.app_protocol = NDPI_PROTOCOL_IP_ICMP,
       ndpiDetectedProtocol.master_protocol = NDPI_PROTOCOL_UNKNOWN;
     setDetectedProtocol(ndpiDetectedProtocol, true);
-=======
-  default:
-    ndpi_detected_protocol = ndpi_guess_undetected_protocol(iface->get_ndpi_struct(),
-							    protocol, 0, 0, 0, 0).protocol;
->>>>>>> dc3872b88c463aa5e5ba333fd357c8641f72c283
     break;
 
   case IPPROTO_ICMPV6:
@@ -290,7 +284,7 @@ void Flow::dumpFlowAlert() {
       break;
 
     case status_ssl_certificate_mismatch: /* 10 */
-      do_dump = true;
+      do_dump = ntop->getPrefs()->are_ssl_alerts_enabled();
       break;
     }
 
@@ -348,13 +342,13 @@ void Flow::checkBlacklistedFlow() {
       char fbuf[256], alert_msg[1024];
 
       snprintf(alert_msg, sizeof(alert_msg),
-	       "%s <A HREF='%s/lua/host_details.lua?host=%s&ifid=%d&page=alerts'>%s</A> contacted %s host "
+	       "%s <A HREF='%s/lua/host_details.lua?host=%s&ifid=%d&page=alerts'>%s</A> contacted %s "
 	       "<A HREF='%s/lua/host_details.lua?host=%s&ifid=%d&page=alerts'>%s</A> [%s]",
-	       cli_host->isBlacklisted() ? "blacklisted" : "",
+	       cli_host->isBlacklisted() ? "blacklisted host" : "host",
 	       ntop->getPrefs()->get_http_prefix(),
 	       c, iface->get_id(),
 	       cli_host->get_visual_name(c_name, sizeof(c_name)),
-	       srv_host->isBlacklisted() ? "blacklisted" : "",
+	       srv_host->isBlacklisted() ? "blacklisted host" : "host",
 	       ntop->getPrefs()->get_http_prefix(),
 	       s, iface->get_id(),
 	       srv_host->get_visual_name(s_name, sizeof(s_name)),
@@ -512,9 +506,6 @@ void Flow::processDetectedProtocol() {
     if((protos.ssl.certificate == NULL)
        && (ndpiFlow->protos.ssl.client_certificate[0] != '\0')) {
       protos.ssl.certificate = strdup(ndpiFlow->protos.ssl.client_certificate);
-      
-		
-	/* ------- */
 
       if(protos.ssl.certificate && (strncmp(protos.ssl.certificate, "www.", 4) == 0)) {
 	if(ndpi_is_proto(ndpiDetectedProtocol, NDPI_PROTOCOL_TOR))
@@ -551,9 +542,7 @@ void Flow::processDetectedProtocol() {
 			{
 				protos.ssl.version = strdup("1.3");
 			}
-		}
-		//affichage de la version SSL client si le hanshake n'est pas encore valide
-		else
+		}else 		//affichage de la version SSL client si le hanshake n'est pas encore valide
 		{
 			if(packet->payload[1] == 0x03 && packet->payload[2] == 0x01) 
 			{
@@ -637,20 +626,12 @@ void Flow::guessProtocol() {
   if((protocol == IPPROTO_TCP) || (protocol == IPPROTO_UDP)) {
     if(cli_host && srv_host) {
       /* We can guess the protocol */
-<<<<<<< HEAD
       IpAddress *cli_ip = cli_host->get_ip(), *srv_ip = srv_host->get_ip();
       ndpiDetectedProtocol = ndpi_guess_undetected_protocol(iface->get_ndpi_struct(), protocol,
 							    ntohl(cli_ip ? cli_ip->get_ipv4() : 0),
 							    ntohs(cli_port),
 							    ntohl(srv_ip ? srv_ip->get_ipv4() : 0),
 							    ntohs(srv_port));
-=======
-      ndpi_detected_protocol = ndpi_guess_undetected_protocol(iface->get_ndpi_struct(), protocol,
-							      ntohl(cli_host->get_ip()->get_ipv4()),
-							      ntohs(cli_port),
-							      ntohl(srv_host->get_ip()->get_ipv4()),
-							      ntohs(srv_port)).protocol;
->>>>>>> dc3872b88c463aa5e5ba333fd357c8641f72c283
     }
 
     l7_protocol_guessed = true;
@@ -1638,18 +1619,18 @@ void Flow::lua(lua_State* vm, AddressTree * ptree,
       if(isSSL()) {
 	if(protos.ssl.certificate)
 	  lua_push_str_table_entry(vm, "protos.ssl.certificate", protos.ssl.certificate);
-	  
-	/* --------------- version ssl ------------------ */
-	
-	if(protos.ssl.version)
-	  lua_push_str_table_entry(vm, "protos.ssl.version", protos.ssl.version);
-
-	/* --- */
 	
 	if(protos.ssl.server_certificate)
 	  lua_push_str_table_entry(vm, "protos.ssl.server_certificate", protos.ssl.server_certificate);
       }
     }
+    
+    /* --------------- version ssl ------------------ */
+	
+	if(protos.ssl.version)
+	  lua_push_str_table_entry(vm, "protos.ssl.version", protos.ssl.version);
+
+	/* --- */
     
     lua_push_str_table_entry(vm, "moreinfo.json", get_json_info());
 
@@ -1789,7 +1770,6 @@ char* Flow::serialize(bool es_json) {
 
   if(es_json) {
     ntop->getPrefs()->set_json_symbolic_labels_format(true);
-<<<<<<< HEAD
     if((my_object = flow2json()) != NULL) {
 
       /* JSON string */
@@ -1797,16 +1777,6 @@ char* Flow::serialize(bool es_json) {
 
       /* Free memory */
       json_object_put(my_object);
-=======
-    if((my_object = flow2json(partial_dump)) != NULL) {
-      es_object = flow2es(my_object);
-      
-      /* JSON string */
-      rsp = strdup(json_object_to_json_string(es_object));
-      
-      /* Free memory (it will also free enclosed object my_object) */
-      json_object_put(es_object);
->>>>>>> dc3872b88c463aa5e5ba333fd357c8641f72c283
     } else
       rsp = NULL;
   } else {
@@ -1867,10 +1837,6 @@ json_object* Flow::flow2json() {
   if(((cli2srv_packets - last_db_dump.cli2srv_packets) == 0)
      && ((srv2cli_packets - last_db_dump.srv2cli_packets) == 0))
     return(NULL);
-
-  if(((cli2srv_packets - last_db_dump.cli2srv_packets) == 0)
-     && ((srv2cli_packets - last_db_dump.srv2cli_packets) == 0))
-    return(NULL); 
 
   if((my_object = json_object_new_object()) == NULL) return(NULL);
 
@@ -2048,7 +2014,6 @@ json_object* Flow::flow2json() {
   if(bt_hash)
     json_object_object_add(my_object, "BITTORRENT_HASH", json_object_new_string(bt_hash));
 
-<<<<<<< HEAD
   if(isSSL() && protos.ssl.certificate)
     json_object_object_add(my_object, "SSL_SERVER_NAME", json_object_new_string(protos.ssl.certificate));
 
@@ -2112,13 +2077,6 @@ bool Flow::isIdleFlow() {
     if((getCli2SrvCurrentInterArrivalTime(now) > threshold_ms)
        || ((srv2cli_packets > 0) && (getSrv2CliCurrentInterArrivalTime(now) > threshold_ms)))
       return(true);
-=======
-  if(http.last_url && http.last_method) {
-    json_object_object_add(my_object, "HTTP_URL", json_object_new_string(http.last_url));
-    json_object_object_add(my_object, "HTTP_METHOD", json_object_new_string(http.last_method));
-    json_object_object_add(my_object, "HTTP_RET_CODE", json_object_new_int((u_int32_t)http.last_return_code));
-    json_object_object_add(my_object, "HTTP_HOST", json_object_new_string(host_server_name));
->>>>>>> dc3872b88c463aa5e5ba333fd357c8641f72c283
   }
 
   return(false); /* Not idle */

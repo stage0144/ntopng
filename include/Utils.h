@@ -101,6 +101,11 @@ class Utils {
   static u_int32_t getHostManagementIPv4Address();
   static bool isInterfaceUp(char *ifname);
   static bool maskHost(bool isLocalIP);
+
+  /* System Host Montiring and Diagnose Functions */
+  static void luaCpuLoad(lua_State* vm);
+  static void luaMeminfo(lua_State* vm);
+  
 };
 
 #endif /* _UTILS_H_ */

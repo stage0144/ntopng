@@ -785,15 +785,10 @@ HTTPserver::HTTPserver(const char *_docs_dir, const char *_scripts_dir) {
   httpd_v4 = mg_start(&callbacks, NULL, (const char**)http_options);
 
   if(httpd_v4 == NULL) {
-<<<<<<< HEAD
     ntop->getTrace()->traceEvent(TRACE_ERROR, "Unable to start HTTP server (IPv4) on ports %s", ports);
     if (errno)
       ntop->getTrace()->traceEvent(TRACE_ERROR, "%s", strerror(errno));
     exit(-1);
-=======
-    ntop->getTrace()->traceEvent(TRACE_ERROR, "Unable to start HTTP server (IPv4) on ports %s: %s", ports, strerror(errno));
-    _exit(-1);
->>>>>>> dc3872b88c463aa5e5ba333fd357c8641f72c283
   }
 
   /* ***************************** */

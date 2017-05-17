@@ -118,11 +118,7 @@ class Redis {
   int lrem(const char *queue_name, const char *value);
   int lrange(const char *list_name, char ***elements, int start_offset, int end_offset);
   int lpop(const char *queue_name, char *buf, u_int buf_len);
-<<<<<<< HEAD
   int lpop(const char *queue_name, char ***elements, u_int num_elements);
-=======
-  void startFlowDump();
->>>>>>> dc3872b88c463aa5e5ba333fd357c8641f72c283
 
   /**
    * @brief Increment a redis key and return its new value

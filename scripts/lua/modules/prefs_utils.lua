@@ -33,6 +33,12 @@ function hasNagiosSupport()
    return prefs.nagios_nsca_host ~= nil
 end
 
+function hasAlertsDisabled()
+  return (prefs.has_cmdl_disable_alerts == true) or
+      ((_POST["disable_alerts_generation"] ~= nil) and (_POST["disable_alerts_generation"] == "1")) or
+      ((_POST["disable_alerts_generation"] == nil) and (ntop.getPref("ntopng.prefs.disable_alerts_generation") == "1"))
+end
+
 -- This table is used both to control access to the preferences and to filter preferences results
 menu_subpages = {
   {id="auth",          label=i18n("prefs.user_authentication"),  advanced=false, pro_only=true,   disabled=false, entries={
@@ -165,7 +171,7 @@ menu_subpages = {
       hidden      = (prefs.is_dump_flows_to_mysql_enabled == false),
     }
     
-  }}, {id="ext_alerts",    label=i18n("prefs.external_alerts"), advanced=false, pro_only=false,  disabled=alerts_disabled, entries={
+  }}, {id="ext_alerts",    label=i18n("prefs.external_alerts"), advanced=false, pro_only=false,  disabled=hasAlertsDisabled(), entries={
     toggle_alert_syslog = {
       title       = i18n("prefs.toggle_alert_syslog_title"),
       description = i18n("prefs.toggle_alert_syslog_description"),
@@ -231,7 +237,7 @@ menu_subpages = {
       description = i18n("prefs.toggle_autologout_description"),
     }, google_apis_browser_key = {
       title       = i18n("prefs.google_apis_browser_key_title"),
-      description = i18n("prefs.google_apis_browser_key_description", {url="https://googlegeodevelopers.blogspot.it/2016-17/06/building-for-scale-updates-to-google.html"}),
+      description = i18n("prefs.google_apis_browser_key_description", {url="https://maps-apis.googleblog.com/2016/06/building-for-scale-updates-to-google.html"}),
     }, toggle_thpt_content = {
       title       = i18n("prefs.toggle_thpt_content_title"),
       description = i18n("prefs.toggle_thpt_content_description"),

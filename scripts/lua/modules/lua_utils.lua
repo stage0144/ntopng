@@ -382,29 +382,29 @@ alert_entity_keys = {
 }
 
 alert_engine_keys = {
-   {"Per Minute",  0, "min"    },
-   {"Five Minutes", 1, "5mins"  },
-   {"Hourly",    2, "hour"   },
-   {"Daily",     3, "day"    },
-   {"Startup",   4, "startup"},
+   {i18n("show_alerts.minute"),  0, "min"    },
+   {i18n("show_alerts.five_minutes"), 1, "5mins"  },
+   {i18n("show_alerts.hourly"),    2, "hour"   },
+   {i18n("show_alerts.daily"),     3, "day"    },
+   {i18n("show_alerts.startup"),   4, "startup"},
 }
 
 -- Note: keep in sync with alarmable_metrics and alert_functions_infoes
 alert_functions_description = {
-   ["active"]  = "Activity time since last check (seconds).",
-   ["bytes"]   = "Layer 2 bytes delta (sent + received)",
-   ["dns"]     = "Layer 2 bytes delta (sent + received) for DNS detected traffic",
-   ["idle"]    = "Idle time since last packet seen (seconds)",	
-   ["packets"] = "Packets delta (sent + received)",
-   ["p2p"]     = "Layer 2 bytes delta (sent + received) for peer-to-peer detected traffic",
-   ["throughput"]   = "Average throughput (sent + received) [Mbps]",
-   ["flows"]   = "Flows delta (as client + as server)",
+   ["active"]  = i18n("alerts_thresholds_config.alert_active_description"),
+   ["bytes"]   = i18n("alerts_thresholds_config.alert_bytes_description"),
+   ["dns"]     = i18n("alerts_thresholds_config.alert_dns_description"),
+   ["idle"]    = i18n("alerts_thresholds_config.alert_idle_description"),
+   ["packets"] = i18n("alerts_thresholds_config.alert_packets_description"),
+   ["p2p"]     = i18n("alerts_thresholds_config.alert_p2p_description"),
+   ["throughput"]   = i18n("alerts_thresholds_config.alert_throughput_description"),
+   ["flows"]   = i18n("alerts_thresholds_config.alert_flows_description"),
 }
 
 network_alert_functions_description = {
-    ["ingress"] = "Ingress Bytes delta",
-    ["egress"]  = "Egress Bytes delta",
-    ["inner"]   = "Inner Bytes delta",
+    ["ingress"] = i18n("alerts_thresholds_config.alert_network_ingress_description"),
+    ["egress"]  = i18n("alerts_thresholds_config.alert_network_egress_description"),
+    ["inner"]   = i18n("alerts_thresholds_config.alert_network_inner_description"),
 }
 
 function noHtml(s)
@@ -1713,13 +1713,6 @@ function version2int(v)
     major = e[1]
     minor = e[2]
     veryminor = e[3]
-<<<<<<< HEAD
-=======
-    
-    if(major == nil or tonumber(major) == nil or type(major) ~= "string")     then major = 0 end
-    if(minor == nil or tonumber(minor) == nil or type(minor) ~= "string")     then minor = 0 end
-    if(veryminor == nil or tonumber(veryminor) == nil or type(veryminor) ~= "string") then veryminor = 0 end
->>>>>>> dc3872b88c463aa5e5ba333fd357c8641f72c283
 
     if(major == nil or tonumber(major) == nil or type(major) ~= "string")     then major = 0 end
     if(minor == nil or tonumber(minor) == nil or type(minor) ~= "string")     then minor = 0 end
@@ -2302,7 +2295,6 @@ function get_symbolic_mac(mac_address, only_symbolic)
    end
 end
 
-<<<<<<< HEAD
 function get_manufacturer_mac(mac_address)
   local m = string.sub(mac_address, 1, 8)
   local ret = get_mac_classification(m, true --[[ extended name --]])
@@ -3160,16 +3152,56 @@ function isBridgeInterface(ifstats)
   return (ifstats["bridge.device_a"] ~= nil) and (ifstats["bridge.device_b"] ~= nil)
 end
 
-function isCaptivePortalActive(ifstats)
+-- Returns true if the captive portal can be started with the current configuration
+function isCaptivePortalSupported(ifstats, prefs, skip_interface_check)
+   if not ntop.isEnterprise() then
+      return false
+   end
+
+   local is_bridge_iface
+
+   if not skip_interface_check then
+      local ifstats = ifstats or interface.getStats()
+      is_bridge_iface = isBridgeInterface(ifstats)
+   else
+      is_bridge_iface = true
+   end
+
+   local prefs = prefs or ntop.getPrefs()
+   return is_bridge_iface and (prefs["http.port"] == 80) and (prefs["http.alt_port"] ~= 0)
+end
+
+-- Returns true if the captive portal is active right now
+function isCaptivePortalActive(ifstats, prefs)
   if not ntop.isEnterprise() then
     return false
   end
 
   local ifstats = ifstats or interface.getStats()
+  local prefs = prefs or ntop.getPrefs()
   local is_bridge_iface = isBridgeInterface(ifstats)
-  local is_captive_portal_enabled = ntop.getPrefs()["is_captive_portal_enabled"]
 
-  return is_bridge_iface and is_captive_portal_enabled
+  return is_bridge_iface and prefs["is_captive_portal_enabled"] and isCaptivePortalSupported(ifstats, prefs)
+end
+
+function getCaptivePortalUsers()
+  local keys = ntop.getKeysCache("ntopng.user.*.host_pool_id")
+  local users = {}
+
+  for key in pairs(keys or {}) do
+    local host_pool = ntop.getCache(key)
+
+    if not isEmptyString(host_pool) then
+      local username = split(key, "%.")[3]
+      users[username] = host_pool
+    end
+  end
+
+  return users
+end
+
+function getBridgeInitializedKey()
+  return "ntopng.prefs.bridge_initialized"
 end
 
 function hasSnmpDevices(ifid)
@@ -3218,27 +3250,3 @@ end
 -- defined in this file
 --
 http_lint = require "http_lint"
-=======
-function makeTopStatsScriptsArray()
-   path = dirs.installdir .. "/scripts/lua/modules/top_scripts"
-   path = fixPath(path)
-   local files = ntop.readdir(path)
-   topArray = {}
-
-   for k,v in pairs(files) do
-      if(v ~= nil) then
-	 value = {}
-	 fn,ext = v:match("([^.]+).([^.]+)")
-	 mod = require("top_scripts."..fn)
-	 if(type(mod) ~= type(true)) then
-            value["name"] = mod.name
-            value["script"] = mod.infoScript
-            value["key"] = mod.infoScriptKey
-            value["levels"] = mod.numLevels
-            topArray[fn] = value
-	 end
-      end
-   end
-   return(topArray)
-end
->>>>>>> dc3872b88c463aa5e5ba333fd357c8641f72c283

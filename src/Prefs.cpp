@@ -29,13 +29,11 @@ Prefs::Prefs(Ntop *_ntop) {
   ntop = _ntop, sticky_hosts = location_none, simulate_vlans = false;
   local_networks = strdup(CONST_DEFAULT_HOME_NET "," CONST_DEFAULT_LOCAL_NETS);
   local_networks_set = false, shutdown_when_done = false;
+  safe_search_dns_ip = inet_addr((char*)DEFAULT_SAFE_SEARCH_DNS);
+  global_dns_ip = 0; /* No DNS */
   enable_users_login = true, disable_localhost_login = false;
   enable_dns_resolution = sniff_dns_responses = true, use_promiscuous_mode = true;
-<<<<<<< HEAD
   resolve_all_host_ip = false, online_license_check = false;
-=======
-  categorization_enabled = false, httpbl_enabled = false, resolve_all_host_ip = false;
->>>>>>> dc3872b88c463aa5e5ba333fd357c8641f72c283
   max_num_hosts = MAX_NUM_INTERFACE_HOSTS, max_num_flows = MAX_NUM_INTERFACE_HOSTS;
   attacker_max_num_flows_per_sec = victim_max_num_flows_per_sec = CONST_MAX_NEW_FLOWS_SECOND;
   attacker_max_num_syn_per_sec = victim_max_num_syn_per_sec = CONST_MAX_NUM_SYN_PER_SECOND;  
@@ -48,17 +46,12 @@ Prefs::Prefs(Ntop *_ntop) {
   scripts_dir = strdup(CONST_DEFAULT_SCRIPTS_DIR);
   callbacks_dir = strdup(CONST_DEFAULT_CALLBACKS_DIR);
   config_file_path = ndpi_proto_path = NULL;
-<<<<<<< HEAD
   http_port = CONST_DEFAULT_NTOP_PORT, alt_http_port = 0;
   http_prefix = strdup(""), zmq_encryption_pwd = NULL;
   instance_name = NULL;
   categorization_enabled = false, enable_users_login = true;
   categorization_key = NULL, zmq_encryption_pwd = NULL;
   es_index = es_url = es_user = es_pwd = NULL;
-=======
-  http_port = CONST_DEFAULT_NTOP_PORT;
-  http_prefix = strdup("");
->>>>>>> dc3872b88c463aa5e5ba333fd357c8641f72c283
   https_port = 0; // CONST_DEFAULT_NTOP_PORT+1;
   change_user = true, daemonize = false;
   user = strdup(CONST_DEFAULT_NTOP_USER);
@@ -75,7 +68,6 @@ Prefs::Prefs(Ntop *_ntop) {
   disable_alerts = enable_captive_portal = false;
   enable_top_talkers = false;
   slack_notifications_enabled = false;
-  safe_search_dns = strdup(DEFAULT_SAFE_SEARCH_DNS), global_dns = strdup(DEFAULT_GLOBAL_DNS);
   max_num_alerts_per_entity = ALERTS_MANAGER_MAX_ENTITY_ALERTS;
   max_num_flow_alerts = ALERTS_MANAGER_MAX_FLOW_ALERTS;
   max_num_packets_per_tiny_flow = CONST_DEFAULT_MAX_NUM_PACKETS_PER_TINY_FLOW;
@@ -174,8 +166,6 @@ Prefs::~Prefs() {
   if(ls_proto)	      free(ls_proto);
   if(http_binding_address)  free(http_binding_address);
   if(https_binding_address) free(https_binding_address);
-  if(safe_search_dns) free(safe_search_dns);
-  if(global_dns) free(global_dns);
   /* NOTE: flashstart is deleted by the Ntop class */
 }
 
@@ -419,7 +409,7 @@ void Prefs::setAlertsEnabledFromRedis(){
 void Prefs::getDefaultStringPrefsValue(const char *pref_key, char **buffer, const char *default_value) {
   char rsp[MAX_PATH];
 
-  if(ntop->getRedis()->get((char*)pref_key, rsp, sizeof(rsp)) == 0)
+  if((ntop->getRedis()->get((char*)pref_key, rsp, sizeof(rsp)) == 0) && (rsp[0] != '\0'))
     *buffer = strdup(rsp);
   else
     *buffer = strdup(default_value);
@@ -439,6 +429,8 @@ bool Prefs::getDefaultBoolPrefsValue(const char *pref_key, const bool default_va
 /* ******************************************* */
 
 void Prefs::reloadPrefsFromRedis() {
+  char *safe_search_dns, *global_dns;
+
   /* Attempt to load preferences set from the web ui and apply default values in not found */
   active_local_hosts_cache_interval = getDefaultPrefsValue(CONST_RUNTIME_ACTIVE_LOCAL_HOSTS_CACHE_INTERVAL,
 							   CONST_DEFAULT_ACTIVE_LOCAL_HOSTS_CACHE_INTERVAL);
@@ -505,10 +497,13 @@ void Prefs::reloadPrefsFromRedis() {
   setAlertsEnabledFromRedis();
   refreshHostsAlertsPrefs();
 
-  if (safe_search_dns) free(safe_search_dns);
   getDefaultStringPrefsValue(CONST_SAFE_SEARCH_DNS, &safe_search_dns, DEFAULT_SAFE_SEARCH_DNS);
-  if (global_dns) free(global_dns);
+  safe_search_dns_ip = inet_addr(safe_search_dns);
+  free(safe_search_dns);
+
   getDefaultStringPrefsValue(CONST_GLOBAL_DNS, &global_dns, DEFAULT_GLOBAL_DNS);
+  global_dns_ip = inet_addr(global_dns);
+  free(global_dns);
 }
 
 /* ******************************************* */
@@ -1047,14 +1042,9 @@ int Prefs::setOption(int optkey, char *optarg) {
 	   );
     printf("GIT rev:   %s\n", NTOPNG_GIT_RELEASE);
 #ifdef NTOPNG_PRO
-<<<<<<< HEAD
     printf("Pro rev:   %s\n", NTOPNG_PRO_GIT_RELEASE);
     printf("System Id: %s\n", ntop->getPro()->get_system_id());
     printf("Built on:  %s\n", PACKAGE_OS);
-=======
-    printf("Pro rev:   %s\n", NTOPNG_PRO_SVN_RELEASE);
-    printf("System Id: %s\n", ntop->getPro()->get_system_id());
->>>>>>> dc3872b88c463aa5e5ba333fd357c8641f72c283
 #endif
     exit(0);
     break;
@@ -1280,6 +1270,7 @@ void Prefs::lua(lua_State* vm) {
 #ifdef NTOPNG_PRO
   char HTTP_stats_base_dir[MAX_PATH*2];
 #endif
+  char buf[32];
 
   lua_newtable(vm);
 
@@ -1335,8 +1326,8 @@ void Prefs::lua(lua_State* vm) {
   lua_push_int_table_entry(vm, "max_num_flow_alerts", max_num_flow_alerts);
 
   lua_push_bool_table_entry(vm, "slack_enabled", slack_notifications_enabled);
-  lua_push_str_table_entry(vm, "safe_search_dns", safe_search_dns);
-  lua_push_str_table_entry(vm, "global_dns", global_dns);
+  lua_push_str_table_entry(vm, "safe_search_dns", Utils::intoaV4(ntohl(safe_search_dns_ip), buf, sizeof(buf)));
+  lua_push_str_table_entry(vm, "global_dns", Utils::intoaV4(ntohl(global_dns_ip), buf, sizeof(buf)));
 
   /* Tiny flows preferences */
   lua_push_int_table_entry(vm, "max_num_packets_per_tiny_flow", max_num_packets_per_tiny_flow);
@@ -1467,13 +1458,11 @@ int Prefs::refresh(const char *pref_name, const char *pref_value) {
   else if(!strncmp(pref_name,
 		    (char*)CONST_SAFE_SEARCH_DNS,
 		    strlen((char*)CONST_SAFE_SEARCH_DNS))) {
-    if(safe_search_dns) free(safe_search_dns);
-    safe_search_dns = strdup(pref_value);
+    safe_search_dns_ip = inet_addr(pref_value);
   } else if(!strncmp(pref_name,
 		    (char*)CONST_GLOBAL_DNS,
 		    strlen((char*)CONST_GLOBAL_DNS))) {
-    if(global_dns) free(global_dns);
-    global_dns = strdup(pref_value);
+    global_dns_ip = inet_addr(pref_value);
   } else if(!strncmp(pref_name,
 		    (char*)CONST_MAX_NUM_FLOW_ALERTS,
 		    strlen((char*)CONST_MAX_NUM_FLOW_ALERTS)))

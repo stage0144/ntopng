@@ -1391,7 +1391,6 @@ bool NetworkInterface::processPacket(const struct bpf_timeval *when,
 	struct ndpi_id_struct *cli = (struct ndpi_id_struct*)flow->get_cli_id();
 	struct ndpi_id_struct *srv = (struct ndpi_id_struct*)flow->get_srv_id();
 
-<<<<<<< HEAD
 	if(flow->get_packets() >= NDPI_MIN_NUM_PACKETS)
 	  flow->setDetectedProtocol(ndpi_detection_giveup(ndpi_struct, ndpi_flow), false);
 	else
@@ -1403,14 +1402,6 @@ bool NetworkInterface::processPacket(const struct bpf_timeval *when,
 	// ntop->getTrace()->traceEvent(TRACE_WARNING, "IP fragments are not handled yet!");
       }
     }
-=======
-    flow->setDetectedProtocol(ndpi_detection_process_packet(ndpi_struct, ndpi_flow,
-							    ip, ipsize, (u_int32_t)time,
-							    cli, srv).protocol);
-  } else {
-    // FIX - only handle unfragmented packets
-    // ntop->getTrace()->traceEvent(TRACE_WARNING, "IP fragments are not handled yet!");
->>>>>>> dc3872b88c463aa5e5ba333fd357c8641f72c283
   }
 
   if(flow->isDetectionCompleted()
@@ -2107,14 +2098,8 @@ bool NetworkInterface::processPacket(const struct bpf_timeval *when,
 				       u_int8_t src_mac[6], IpAddress *_src_ip, Host **src,
 				       u_int8_t dst_mac[6], IpAddress *_dst_ip, Host **dst) {
 
-    if(!isView())
-      (*src) = hosts_hash->get(vlanId, _src_ip);
-    else {
-      for(u_int8_t s = 0; s<numSubInterfaces; s++) {
-	if(((*src) = subInterfaces[s]->get_hosts_hash()->get(vlanId, _src_ip)) != NULL)
-	  break;
-      }
-    }
+    /* Do not look on sub interfaces, Flows are always created in the same interface of its hosts */
+    (*src) = hosts_hash->get(vlanId, src_mac, _src_ip);
 
     if((*src) == NULL) {
       if(!hosts_hash->hasEmptyRoom()) {
@@ -2138,7 +2123,7 @@ bool NetworkInterface::processPacket(const struct bpf_timeval *when,
 
     /* ***************************** */
 
-    (*dst) = hosts_hash->get(vlanId, _dst_ip);
+    (*dst) = hosts_hash->get(vlanId, dst_mac, _dst_ip);
 
     if((*dst) == NULL) {
       if(!hosts_hash->hasEmptyRoom()) {
@@ -5233,11 +5218,11 @@ bool NetworkInterface::processPacket(const struct bpf_timeval *when,
     if(!f) return(CONST_LUA_ERROR);
 
     if(ntop_lua_check(vm, __FUNCTION__, params+1, LUA_TNUMBER)) return(CONST_LUA_ERROR);
-    activityID = (UserActivityID)lua_tonumber(vm, ++params);
+    activityID = (UserActivityID)((int)lua_tonumber(vm, ++params));
     if(activityID >= UserActivitiesN) return(CONST_LUA_ERROR);
 
     if(lua_type(vm, params+1) == LUA_TNUMBER)
-      filterID = (ActivityFilterID)lua_tonumber(vm, ++params);
+      filterID = (ActivityFilterID)((int)lua_tonumber(vm, ++params));
     else
       return(CONST_LUA_ERROR);
 

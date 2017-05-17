@@ -146,6 +146,9 @@ var prev_local   = 0;
 var prev_remote  = 0;
 var prev_epoch   = 0;
 
+var prev_cpu_load = 0;
+var prev_cpu_idle = 0;
+
 var footerRefresh = function() {
     $.ajax({
       type: 'GET',
@@ -227,7 +230,34 @@ print [[/lua/logout.lua");  }, */
 print[[
 }
 	      } /* closes if (prev_bytes > 0) */
-		var msg = "&nbsp;<i class=\"fa fa-clock-o\"></i> <small>"+rsp.localtime+" | Uptime: "+rsp.uptime+"</small><br>";
+
+		var msg = "&nbsp;<i class=\"fa fa-clock-o\"></i> <small>"+rsp.localtime+" | Uptime: "+rsp.uptime+"</small>";
+
+                if(rsp.system_host_stats.mem_total !== undefined) {
+                   var mem_total = rsp.system_host_stats.mem_total;
+                   var mem_used = rsp.system_host_stats.mem_used;
+
+                   var mem_used_ratio = mem_used / mem_total;
+                   mem_used_ratio = mem_used_ratio * 100;
+                   mem_used_ratio = Math.round(mem_used_ratio * 100) / 100;
+                   mem_used_ratio = mem_used_ratio + "%";
+                   $('#ram-used').html('used: ' + mem_used_ratio + ' / available: ' + bytesToSize((mem_total - mem_used) * 1024) + ' / total: ' + bytesToSize(mem_total * 1024));
+                }
+
+                if(rsp.system_host_stats.cpu_load !== undefined) {
+                  var load = "...";
+                  if(prev_cpu_load > 0) {
+                     var active = (rsp.system_host_stats.cpu_load - prev_cpu_load);
+                     var idle = (rsp.system_host_stats.cpu_idle - prev_cpu_idle);
+                     load = active / (active + idle);
+                     load = load * 100;
+                     load = Math.round(load * 100) / 100;
+                     load = load + "%";
+                  }
+                  $('#cpu-load-pct').html(load);
+                }
+
+                msg += "<br>";
 
 		if(rsp.engaged_alerts > 0) {
                    // var warning_color = "#F0AD4E"; // bootstrap warning orange
@@ -314,6 +344,10 @@ print [[/lua/if_stats.lua\"><i class=\"fa fa-warning\" style=\"color: #B94A48;\"
             prev_local   = rsp.local2remote;
             prev_remote  = rsp.remote2local;
 	    prev_epoch   = rsp.epoch;
+            if(rsp.system_host_stats.cpu_load !== undefined) {
+              prev_cpu_load = rsp.system_host_stats.cpu_load;
+              prev_cpu_idle = rsp.system_host_stats.cpu_idle;
+            }
 
 	  } catch(e) {
 	     console.log(e);
@@ -350,6 +384,15 @@ $(document).ready(function(){
 });
 
 ]]
+
+-- Bridge wizard check
+if isAdministrator()
+ and isBridgeInterface(_ifstats)
+ and ntop.isEnterprise()
+ and (ntop.getCache(getBridgeInitializedKey()) ~= "1") then
+  print("$('#bridgeWizardModal').modal();")
+  ntop.setCache(getBridgeInitializedKey(), "1")
+end
 
 -- This code rewrites the current page state after a POST request to avoid Document Expired errors
 if not table.empty(_POST) then
