@@ -552,6 +552,26 @@ void Flow::processDetectedProtocol() {
 				protos.ssl.version = strdup("1.3");
 			}
 		}
+		//affichage de la version SSL client si le hanshake n'est pas encore valide
+		else
+		{
+			if(packet->payload[1] == 0x03 && packet->payload[2] == 0x01) 
+			{
+				protos.ssl.version = strdup("1.0");
+			}
+			else if(packet->payload[1] == 0x03 && packet->payload[2] == 0x02)
+			{
+				protos.ssl.version = strdup("1.1");
+			}
+			else if(packet->payload[1] == 0x03 && packet->payload[2] == 0x03)
+			{
+				protos.ssl.version = strdup("1.2");
+			}
+			else if(packet->payload[1] == 0x03 && packet->payload[2] == 0x04)
+			{
+				protos.ssl.version = strdup("1.3");
+			}
+		}
 	}
 	
 	/* --------- */
