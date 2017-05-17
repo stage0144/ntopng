@@ -519,7 +519,6 @@ void Flow::processDetectedProtocol() {
     }
     
     /* rajout de la version du ssl */
-    		protos.ssl.version = NULL;
   
 	if(protos.ssl.version == NULL)
 	{
