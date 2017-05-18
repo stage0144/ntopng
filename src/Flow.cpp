@@ -520,7 +520,7 @@ void Flow::processDetectedProtocol() {
     
     /* rajout de la version du ssl */
   
-	if((protos.ssl.version == NULL) && (&ndpiFlow->packet != '\0'))
+	if((isSSL()) && (&ndpiFlow->packet != '\0'))
 	{
 		struct ndpi_packet_struct *packet = &ndpiFlow->packet;
 		if(packet->payload[0] == 0x16){ // on récupère la version serveur du SSL si il y a un Handshake
@@ -1600,18 +1600,25 @@ void Flow::lua(lua_State* vm, AddressTree * ptree,
       if(isSSL()) {
 	if(protos.ssl.certificate)
 	  lua_push_str_table_entry(vm, "protos.ssl.certificate", protos.ssl.certificate);
-	
+
 	if(protos.ssl.server_certificate)
 	  lua_push_str_table_entry(vm, "protos.ssl.server_certificate", protos.ssl.server_certificate);
+
+	/* --------------- version ssl ------------------ */
+	
+	if(protos.ssl.version) //la méthode avec la récupération du packet sur le flowNDPI fonctionne
+	  lua_push_str_table_entry(vm, "protos.ssl.version", protos.ssl.version);
+	else // La première méthode ne fonctionne pas (cas avec nprobe par exemple)
+	{ 
+	  lua_push_str_table_entry(vm,"protos.ssl.version","lalal");
+	}
+	
+	/* --- */
+
       }
     }
+   
     
-    /* --------------- version ssl ------------------ */
-	
-	if(protos.ssl.version)
-	  lua_push_str_table_entry(vm, "protos.ssl.version", protos.ssl.version);
-
-	/* --- */
     
     lua_push_str_table_entry(vm, "moreinfo.json", get_json_info());
 
